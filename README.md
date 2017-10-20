@@ -4,6 +4,7 @@ Visualizing and understanding trends in complaints received by the Consumer Fina
 This program creates a variety of plots with data from the Consumer Complaints Database, organized by the CFPB.
 
 Link to where the data can be downloaded: https://catalog.data.gov/dataset/consumer-complaint-database#topic=consumer_navigation
+Be sure to have this csv file in your working directory when running the code.
 
 Comments in the code reflect my exploratory research questions, and how the data supports or refutes my thinking.
 
