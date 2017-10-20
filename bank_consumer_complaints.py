@@ -37,8 +37,8 @@ top5frame = consumerdata[s.values]
 
 timelyornot = top5frame.groupby(["Company", "Timely response?"]).size().unstack()
 
-print "How Quickly Does Each Bank Response To Complaints?"
-print timelyornot
+#"How Quickly Does Each Bank Response To Complaints?"
+# print timelyornot
 #Making a stacked barchart with my data
 timelyornot = top5frame.groupby(["Company", "Timely response?"]).size().unstack()
 
