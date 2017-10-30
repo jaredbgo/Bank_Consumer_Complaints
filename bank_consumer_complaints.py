@@ -225,6 +225,20 @@ plt.title("Complaints Over Time for Top 5 Banks")
 plt.legend(loc="best", prop = {"size":5})
 plt.show()
 
+daydict = {6:"Sunday", 0: "Monday", 1:"Tuesday", 2:"Wednesday", 3:"Thursday", 4:"Friday", 5:"Saturday"}
+daylist = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+daylist1 = [each.weekday() for each in top5frame.date_time]
+top5frame["day_num"] = daylist1
+top5frame["day_of_week"] = top5frame["day_num"].map(daydict)
+dayplot = top5frame.groupby("day_num").size().plot(kind = "line", style = "--bo")
+dayplot.set_xticklabels(daylist)
+plt.xlabel("Day of Week")
+plt.ylabel("Total # of Complaints")
+plt.title("Complaints on Different Days from Top 5 Banks")
+plt.show()
+
+
+
 #lets check on which states have a lot of complaints
 top5frame.groupby("State").size().sort_values()[-10:].plot(kind="barh")
 
@@ -232,28 +246,43 @@ plt.xlabel("Total Complaints")
 plt.title("Complaints By State")
 plt.show()
 
-#NExt, we will run some statistical tests to see which variables are related
-#First, lets test if there is a relationship between bank type and whether consumers disputed the complaint response
-#Our null hypothesis is that there is no relationship between our two variables
-#We will test at 1% significance level
+print "Next, we will run some statistical tests to see which variables are related. Because we are looking at relationships between discrete variables, we will use Chi-Squared test of independence."
+print ""
 
-#bank_disputed_cross = pd.crosstab(index = top5frame["Consumer disputed?"], columns = top5frame["Company"], dropna = True)
+print "First, lets test if there is a relationship between bank type and whether consumers disputed the complaint response"
+print ""
+print "Our null hypothesis is that there is no relationship between our two variables"
+print "We will test at 1% significance level"
+
+bank_disputed_cross = pd.crosstab(index = top5frame["Consumer disputed?"], columns = top5frame["Company"], dropna = True)
+print bank_disputed_cross
+print bank_disputed_cross.apply(lambda r: r/r.sum(), axis=0)
+
+#Now with percentages
+
+
 #
-#c_t_val, p_val, dof, e_table = scipy.stats.chi2_contingency(bank_disputed_cross)
+c_t_val, p_val, dof, e_table = scipy.stats.chi2_contingency(bank_disputed_cross)
 #
-#print p_val
-#
-##Our p-value is well below our significance value, so we reject our null hypothesis and conclude that the banks are not the same when it comes to consumer complaints
-#
-#bank_disputed_cross_pct = pd.crosstab(index = top5frame["Consumer disputed?"], columns = top5frame["Company"], dropna = True).apply(lambda x: x/x.sum(), axis = 0)
-##Here we can see that percentage of disputed for each bank, and it is pretty equal
-#
-#disputed_timely_cross = pd.crosstab(index = top5frame["Consumer disputed?"], columns = top5frame["Timely response?"], dropna = True)
-##lets check is being timely and getting disputed is related
-#disputed_timely_cross.apply(lambda x: x/x.sum(), axis = 0)
-#c, p, dof, e = scipy.stats.chi2_contingency(disputed_timely_cross)
-##small p value
-#
+print p_val
+print ""
+print "Our p-value is well below our significance value, so we reject our null hypothesis and conclude that the banks are not the same when it comes to disputed consumer complaints"
+print ""
+
+disputed_timely_cross = pd.crosstab(index = top5frame["Consumer disputed?"], columns = top5frame["Timely response?"], dropna = True)
+print ""
+print "lets check is being timely and getting disputed is related"
+print ""
+print disputed_timely_cross.apply(lambda x: x/x.sum(), axis = 0)
+print ""
+c, p, dof, e = scipy.stats.chi2_contingency(disputed_timely_cross)
+print ""
+print p
+print ""
+print "small p value reveals there is a relationship between timeliness and whether the complaints are disputed."
+print ""
+print "Banks -- be timely and you will have less complaints!"
+
 
 
 
