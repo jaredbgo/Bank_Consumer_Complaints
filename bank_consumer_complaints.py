@@ -8,7 +8,9 @@ from dateutil.parser import parse
 import scipy
 from scipy import stats
 
-
+#1,2,3,4,5
+company_list = ["Wells Fargo", "JP Morgan","Goldman Sachs","Citibank", "Bank of America"]
+daylist = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 consumerdata = pd.read_csv("Consumer_Complaints.csv")
 
 columns = list(consumerdata)
@@ -42,8 +44,8 @@ timelyornot = top5frame.groupby(["Company", "Timely response?"]).size().unstack(
 #Making a stacked barchart with my data
 timelyornot = top5frame.groupby(["Company", "Timely response?"]).size().unstack()
 
-timelyornot.plot(kind = "barh", stacked = True)
-
+timeplot = timelyornot.plot(kind = "barh", stacked = True)
+timeplot.set_yticklabels(company_list)
 plt.title("How Quickly Does Each Bank Respond To Complaints?")
 plt.ylabel("Bank")
 plt.xlabel("Number of Complaints")
@@ -55,7 +57,8 @@ totalcomplaints = timelyornot.No + timelyornot.Yes
 pct = timelyornot.No / totalcomplaints
 timelyornot["pct"] = pct
 
-timelyornot.plot(kind = "barh", y = "pct", color = "y", legend = False)
+time_pct_plot = timelyornot.plot(kind = "barh", y = "pct", color = "y", legend = False)
+time_pct_plot.set_yticklabels(company_list)
 plt.ylabel("Bank")
 plt.xlabel("% Of Complaints That Were Responded To Slowly")
 plt.title("What Percentage Of Complaints Are Responded To Slowly?")
@@ -67,7 +70,9 @@ plt.show()
 
 #We want to see whethermany of the responses were disputed, meaning customers were not happy
 disputedframe = top5frame.groupby(["Company", "Consumer disputed?"]).size().unstack()
-disputedframe.plot(kind = "bar", stacked = True)
+dis_fr_plot = disputedframe.plot(kind = "bar", stacked = True)
+dis_fr_plot.set_xticklabels(company_list)
+plt.xticks(rotation = 45)
 plt.xlabel("Bank")
 plt.ylabel("Total # of complaints")
 plt.title("Are Many Company Responses Disputed by Customers?")
@@ -77,7 +82,8 @@ plt.show()
 total = disputedframe.No + disputedframe.Yes
 pctdis = disputedframe.Yes / total
 disputedframe["pct"] = pctdis
-disputedframe.pct.plot(kind = "barh", color = "r")
+dis_plot = disputedframe.pct.plot(kind = "barh", color = "r")
+dis_plot.set_yticklabels(company_list)
 plt.ylabel("Bank")
 plt.xlabel("% of responses disputed")
 plt.title("Percentage of Company Responses Disputed by Customers")
@@ -95,8 +101,9 @@ groupedpct = grouped5.No + grouped5.Yes
 groupedpct = grouped5.Yes / groupedpct
 grouped5["pct"] = groupedpct
 
-grouped5["pct"].unstack().plot(kind = "bar")
-
+tim_pct_plot = grouped5["pct"].unstack().plot(kind = "bar")
+tim_pct_plot.set_xticklabels(company_list)
+plt.xticks(rotation = 45)
 plt.xlabel("Bank")
 plt.ylabel("% of responses disputed")
 plt.title("Percentage of Company Responses Disputed for Timely and Untimely Responses")
@@ -127,6 +134,7 @@ responsedisputed.plot(kind = "bar", y = "Pct", color = ["g", "r", "b"], legend =
 plt.xlabel("Type of Response from Bank")
 plt.ylabel("% disputed")
 plt.title("Percentage of Company Responses Disputed for Different Bank Responses")
+plt.xticks(rotation = 0)
 plt.show()
 
 #When only given an explanation (and not monetary compensation), the frequency of dispute is 2X!
@@ -142,8 +150,8 @@ monthdict = {1:"January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "J
 
 top5frame["monthname"] = top5frame["month"].map(monthdict)
 
-top5frame.groupby("month").size().plot(kind = "line", style = "--bo", xticks = [1,2,3,4,5,6,7,8,9,10,11,12])
-
+monthplot = top5frame.groupby("month").size().plot(kind = "line", style = "--bo", xticks = [1,2,3,4,5,6,7,8,9,10,11,12])
+monthplot.set_xticklabels(["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"])
 plt.xlabel("Month")
 plt.ylabel("# of Complaints")
 plt.title("Complaints per Month")
@@ -151,9 +159,9 @@ plt.show()
 
 #as we can see, complaints take a drop at the end of the year
 
-top5frame.groupby(["month", "Consumer disputed?"]).size().unstack().plot(kind = "line", style =[ "--bo", "--yo"])
+month_displot = top5frame.groupby(["month", "Consumer disputed?"]).size().unstack().plot(kind = "line", xticks = [1,2,3,4,5,6,7,8,9,10,11,12], style =[ "--bo", "--yo"])
 
-
+month_displot.set_xticklabels(["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"])
 plt.xlabel("Month")
 plt.ylabel("# of Complaints")
 plt.title("Complaints per Month")
@@ -164,7 +172,9 @@ plt.show()
 #We can also see how things change for disputed and undisputed
 
 
-top5frame.groupby(["month", "Company"]).size().unstack().plot(kind = "line", style = ["--ro", "--o", "--go", "--bo", "--yo"]) #by company
+com_month_plot = top5frame.groupby(["month", "Company"]).size().unstack().plot(kind = "line", xticks = [1,2,3,4,5,6,7,8,9,10,11,12], style = ["--ro", "--o", "--go", "--bo", "--yo"]) #by company
+
+com_month_plot.set_xticklabels(["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"])
 plt.xlabel("Month")
 plt.ylabel("# of Complaints")
 plt.title("Complaints per Month For Top 5 Banks")
@@ -191,8 +201,9 @@ plt.show()
 
 
 #lets zoom on 2012:
-top5frame.groupby(["date_time", "Company"]).size().unstack().plot(kind= "line",xlim = (parse("1/1/2012"), parse("12/31/2012")))
-plt.xlabel("Month")
+ttwel_plot = top5frame.groupby(["date_time", "Company"]).size().unstack().plot(kind= "line",xlim = (parse("1/1/2012"), parse("12/31/2012")))
+ttwel_plot.set_xticklabels(["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"])
+plt.xlabel("Month (2012)")
 plt.ylabel("# of Complaints")
 plt.title("Complaints Over Time for Top 5 Banks")
 plt.legend(loc="best", prop = {"size":5})
@@ -200,8 +211,9 @@ plt.show()
 
 #now 2016
 
-top5frame.groupby(["date_time", "Company"]).size().unstack().plot(kind= "line",xlim = (parse("1/1/2016"), parse("12/31/2016")))
-plt.xlabel("Month")
+tsix_plot = top5frame.groupby(["date_time", "Company"]).size().unstack().plot(kind= "line",xlim = (parse("1/1/2016"), parse("12/31/2016")))
+tsix_plot.set_xticklabels(["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"])
+plt.xlabel("Month (2016)")
 plt.ylabel("# of Complaints")
 plt.title("Complaints Over Time for Top 5 Banks")
 plt.legend(loc="best", prop = {"size":5})
@@ -218,15 +230,16 @@ plt.show()
 
 #WE CAN SEE A DISTINCT PATTERS WHERE COMPLAINTS PEEK ON/NEAR WEDNESDAY, AND FALL AT END OF THE WEEK
 #by state
-top5frame.groupby(["date_time", "Company"]).size().unstack().plot(kind= "line",xlim = (parse("12/18/2016"), parse("12/25/2016")))
-plt.xlabel("Day")
+week_plot = top5frame.groupby(["date_time", "Company"]).size().unstack().plot(kind= "line",xlim = (parse("12/19/2016"), parse("12/25/2016")))
+week_plot.set_xticklabels(daylist)
+plt.xlabel("Day (Week of 12/19/2015)")
 plt.ylabel("# of Complaints")
 plt.title("Complaints Over Time for Top 5 Banks")
 plt.legend(loc="best", prop = {"size":5})
 plt.show()
 
 daydict = {6:"Sunday", 0: "Monday", 1:"Tuesday", 2:"Wednesday", 3:"Thursday", 4:"Friday", 5:"Saturday"}
-daylist = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
 daylist1 = [each.weekday() for each in top5frame.date_time]
 top5frame["day_num"] = daylist1
 top5frame["day_of_week"] = top5frame["day_num"].map(daydict)
@@ -267,21 +280,21 @@ c_t_val, p_val, dof, e_table = scipy.stats.chi2_contingency(bank_disputed_cross)
 print p_val
 print ""
 print "Our p-value is well below our significance value, so we reject our null hypothesis and conclude that the banks are not the same when it comes to disputed consumer complaints"
-print ""
-
-disputed_timely_cross = pd.crosstab(index = top5frame["Consumer disputed?"], columns = top5frame["Timely response?"], dropna = True)
-print ""
-print "lets check is being timely and getting disputed is related"
-print ""
-print disputed_timely_cross.apply(lambda x: x/x.sum(), axis = 0)
-print ""
-c, p, dof, e = scipy.stats.chi2_contingency(disputed_timely_cross)
-print ""
-print p
-print ""
-print "small p value reveals there is a relationship between timeliness and whether the complaints are disputed."
-print ""
-print "Banks -- be timely and you will have less complaints!"
+#print ""
+#
+#disputed_timely_cross = pd.crosstab(index = top5frame["Consumer disputed?"], columns = top5frame["Timely response?"], dropna = True)
+#print ""
+#print "lets check is being timely and getting disputed is related"
+#print ""
+#print disputed_timely_cross.apply(lambda x: x/x.sum(), axis = 0)
+#print ""
+#c, p, dof, e = scipy.stats.chi2_contingency(disputed_timely_cross)
+#print ""
+#print p
+#print ""
+#print "small p value reveals there is a relationship between timeliness and whether the complaints are disputed."
+#print ""
+#print "Banks -- be timely and you will have less complaints!"
 
 
 
